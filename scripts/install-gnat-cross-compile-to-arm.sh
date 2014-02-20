@@ -19,9 +19,9 @@ sudo apt-get -y install gcc-4.5-base build-essential make gcc g++ flex bison pat
 # libCLooG doesn't exist perhaps libcloog-ppl0 or libcloog-ppl1
 # testing with "libcloog-ppl0" from main
 
-###
+#####################################
 # Download required sources
-###
+#####################################
 mkdir -pv /opt/arm/src/orig
 cd /opt/arm/src/orig
 
@@ -30,11 +30,13 @@ cd /opt/arm/src/orig
 # Go to http://libre.adacore.com/download/ and download the following three
 # packages in advance, before starting vagrant.
 
-ADACORE_FILES=" gcc-4.5-gpl-2012-src.tgz
-                gdb-7.4-gpl-2012-src.tgz
-                gnat-gpl-2012-src.tgz"
+declare -a ADACORE_FILES=("gcc-4.5-gpl-2012-src.tgz"
+                          "gdb-7.4-gpl-2012-src.tgz"
+                          "gnat-gpl-2012-src.tgz");
 
-for ADACORE_FILE in $ADACORE_FILES
+declare -a ALL_FILES=("${ADACORE_FILES[@]}");
+
+for ADACORE_FILE in "${ADACORE_FILES[@]}"
 do
     # Check if file has been pre-downloaded
     if [ ! -f /home/vagrant/host/downloads/$ADACORE_FILE ];
@@ -61,6 +63,7 @@ declare -a GNU_FILES=("http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.gz"
 for GNU_URL in "${GNU_FILES[@]}"
 do
     GNU_FILE=$(basename $GNU_URL)
+    ALL_FILES+=("$GNU_FILE")
     if [ ! -f /opt/arm/src/orig/$GNU_FILE ]; then
         echo "$GNU_FILE not found, downloading..."
         wget -P /opt/arm/src/orig/ $GNU_URL
@@ -68,3 +71,24 @@ do
         echo "$GNU_FILE found, skipping downloading."
     fi
 done
+
+#####################################
+# Unpack all files
+#####################################
+mkdir -pv /opt/arm/src/src
+cd /opt/arm/src/src/
+
+for DOWNLOADED_FILE in "${ALL_FILES[@]}"
+do
+    if [ -f "/opt/arm/src/orig/$DOWNLOADED_FILE" ];
+    then
+        tar -xvf /opt/arm/src/orig/$DOWNLOADED_FILE
+    fi
+done
+
+chown -R root:root /opt/arm/src/src/
+
+#####################################
+# Patch binutils
+#####################################
+# wget 
