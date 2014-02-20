@@ -40,7 +40,7 @@ $ gnatmake OR make OR ??? (TODO)
 ```
 ### Git usage
 To easier be able to follow code history [git-flow
-methodology]http://nvie.com/posts/a-successful-git-branching-model/ will be
+methodology](http://nvie.com/posts/a-successful-git-branching-model/) will be
 used.  Fork this repository on github and work on features in your own feature
 branches as well as fixes in your own "fix"-branches. When the feature/fix is
 done and the code compiles do a pull request to the development branch in
