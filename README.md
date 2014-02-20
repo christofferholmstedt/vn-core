@@ -12,7 +12,7 @@ common development environment for all developers. Another reason is that
 compiling and configuring the toolchain for Ada on both amd64 and for ARM can
 take a lot of valuable time from development.
 
-##### Get going on Ubuntu 12.04
+### Get going on Ubuntu 12.04
 To install latest Virtualbox and Vagrant on Ubuntu 12.04 do the following:
 
 **Add virtualbox repository and install Virtualbox 4.3 with apt-get**
@@ -38,6 +38,12 @@ $ vagrant ssh
 $ cd host/
 $ gnatmake OR make OR ??? (TODO)
 ```
+### Get going on Windows
+TODO
+
+### Get going on OS X
+TODO
+
 ### Git usage
 To easier be able to follow code history [git-flow
 methodology](http://nvie.com/posts/a-successful-git-branching-model/) will be
