@@ -67,6 +67,10 @@ if [ ! -d /opt/tmp/src_unpacked/gcc ];
 then
     echo "GCC git clone was not found, cloning to /opt/tmp/src_unpacked/gcc"
     git clone https://github.com/mirrors/gcc /opt/tmp/src_unpacked/gcc
+    # Using daily bump commit from 20120224
+    # http://gcc.gnu.org/git/?p=gcc.git;a=commit;h=2a9110cb500e6754c28864a6dfaed185b367516c
+    cd /opt/tmp/src_unpacked/gcc
+    git checkout 2a9110cb500e6754c28864a6dfaed185b367516c
 else
     echo "GCC git clone already available in /opt/tmp/src_unpacked/gcc, skipping."
 fi
@@ -75,7 +79,6 @@ fi
 for PATCH_URL in "${PATCHES[@]}"
 do
     PATCH=$(basename $PATCH_URL)
-    echo /opt/tmp/$PATCH
     if [ ! -f /opt/tmp/$PATCH ]; then
         echo "$PATCH not found, downloading..."
         wget -nc -P /opt/tmp/ $PATCH_URL
