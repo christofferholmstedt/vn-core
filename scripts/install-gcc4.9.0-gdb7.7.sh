@@ -20,75 +20,112 @@ sudo apt-get -y install gcc-4.5-base build-essential make gcc g++ flex bison pat
 # testing with "libcloog-ppl0" from main
 
 #####################################
+# Create required directories
+#####################################
+mkdir -pv /opt/tmp/src_unpacked
+mkdir -pv /opt/tmp/b-native
+mkdir -pv /opt/tmp/b-arm-cross
+mkdir -pv /opt/gcc-4.9-native
+mkdir -pv /opt/gcc-4.9-arm
+
+#####################################
 # Download required sources
 #####################################
-mkdir -pv /opt/arm/src/orig
-cd /opt/arm/src/orig
-
-# Some pre-downloading is required due to AdaCores CDN structure with files
-# only available at different hashes.
-# Go to http://libre.adacore.com/download/ and download the following three
-# packages in advance, before starting vagrant.
-
-declare -a ADACORE_FILES=("gcc-4.5-gpl-2012-src.tgz"
-                          "gdb-7.4-gpl-2012-src.tgz"
-                          "gnat-gpl-2012-src.tgz");
-
-declare -a ALL_FILES=("${ADACORE_FILES[@]}");
-
-for ADACORE_FILE in "${ADACORE_FILES[@]}"
-do
-    # Check if file has been pre-downloaded
-    if [ ! -f /home/vagrant/host/downloads/$ADACORE_FILE ];
-    then
-        echo "$ADACORE_FILE not found!"
-        exit 1 # Abort if file is missing.
-
-    # Check if file has been pre-download and file has been copied to
-    # /opt/arm/src/orig/
-    elif [ -f /home/vagrant/host/downloads/$ADACORE_FILE ] && [ ! -f /opt/arm/src/orig/$ADACORE_FILE ];
-    then
-        echo "$ADACORE_FILE found, copying to /opt/arm/src/orig/"
-        cp -v /home/vagrant/host/downloads/$ADACORE_FILE /opt/arm/src/orig/
-    else
-        echo "$ADACORE_FILE has already been copied to /opt/arm/src/orig/ , skipping..."
-    fi
-done
-
-declare -a GNU_FILES=("http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.gz"
-                      "http://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.gz"
-                      "http://ftp.gnu.org/gnu/mpc/mpc-1.0.2.tar.gz"
-                      "http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.2.tar.gz");
-
-for GNU_URL in "${GNU_FILES[@]}"
-do
-    GNU_FILE=$(basename $GNU_URL)
-    ALL_FILES+=("$GNU_FILE")
-    if [ ! -f /opt/arm/src/orig/$GNU_FILE ]; then
-        echo "$GNU_FILE not found, downloading..."
-        wget -P /opt/arm/src/orig/ $GNU_URL
-    else
-        echo "$GNU_FILE found, skipping downloading."
-    fi
-done
+# Is it perhaps possible to download these files from the GNU GCC repository?
+# All files from one archive would make it a little bit easier to write this
+# script.
+wget -P /opt/tmp/ https://gmplib.org/download/gmp/gmp-4.3.2.tar.bz2
+wget -P /opt/tmp/ http://www.mpfr.org/mpfr-3.1.2/mpfr-3.1.2.tar.bz2
+wget -P /opt/tmp/ ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.2.tar.gz
+wget -P /opt/tmp/ http://isl.gforge.inria.fr/isl-0.11.1.tar.bz2
+wget -P /opt/tmp/ http://www.bastoul.net/cloog/pages/download/count.php3?url=./cloog-0.18.1.tar.gz
+wget -P /opt/tmp/ http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.bz2
+wget -P /opt/tmp/ http://gcc.1065356.n5.nabble.com/attachment/1011154/1/0002-Added-enable-cross-gnattools-flag-for-bare-metal-env.patch
+wget -P /opt/tmp/ http://gcc.1065356.n5.nabble.com/attachment/1011154/0/0001-Set-the-target-for-a-bare-metal-environment.patch
+wget -P /opt/tmp/ ftp://ftp.funet.fi/pub/mirrors/sources.redhat.com/pub/gdb/releases/gdb-7.7.tar.bz2
+wget -P /opt/tmp/ ftp://sourceware.org/pub/newlib/newlib-2.0.0.tar.gz
 
 #####################################
 # Unpack all files
 #####################################
-mkdir -pv /opt/arm/src/src
-cd /opt/arm/src/src/
+if [ -f /opt/tmp/gmp-4.3.2.tar.bz2 ] && [ ! -f /opt/tmp/gmp-4.3.2 ];
+then
+    echo "gmp-4.3.2 found, unpacking to /opt/tmp/gmp-4.3.2/"
+    tar -xvf /opt/tmp/gmp-4.3.2.tar.bz2 -C /opt/tmp/src_unpacked
+fi
 
-for DOWNLOADED_FILE in "${ALL_FILES[@]}"
-do
-    if [ -f "/opt/arm/src/orig/$DOWNLOADED_FILE" ];
-    then
-        tar -xvf /opt/arm/src/orig/$DOWNLOADED_FILE
-    fi
-done
+### Final touch to set proper ownership to all files.
+chown -R root:root /opt/tmp/src_unpacked
 
-chown -R root:root /opt/arm/src/src/
-
+####################################
+# OLD #1 - Download required sources
+####################################
+# mkdir -pv /opt/arm/src/orig
+# cd /opt/arm/src/orig
+#
+# # Some pre-downloading is required due to AdaCores CDN structure with files
+# # only available at different hashes.
+# # Go to http://libre.adacore.com/download/ and download the following three
+# # packages in advance, before starting vagrant.
+#
+# declare -a ADACORE_FILES=("gcc-4.5-gpl-2012-src.tgz"
+#                           "gdb-7.4-gpl-2012-src.tgz"
+#                           "gnat-gpl-2012-src.tgz");
+#
+# declare -a ALL_FILES=("${ADACORE_FILES[@]}");
+#
+# for ADACORE_FILE in "${ADACORE_FILES[@]}"
+# do
+#     # Check if file has been pre-downloaded
+#     if [ ! -f /home/vagrant/host/downloads/$ADACORE_FILE ];
+#     then
+#         echo "$ADACORE_FILE not found!"
+#         exit 1 # Abort if file is missing.
+#
+#     # Check if file has been pre-download and file has been copied to
+#     # /opt/arm/src/orig/
+#     elif [ -f /home/vagrant/host/downloads/$ADACORE_FILE ] && [ ! -f /opt/arm/src/orig/$ADACORE_FILE ];
+#     then
+#         echo "$ADACORE_FILE found, copying to /opt/arm/src/orig/"
+#         cp -v /home/vagrant/host/downloads/$ADACORE_FILE /opt/arm/src/orig/
+#     else
+#         echo "$ADACORE_FILE has already been copied to /opt/arm/src/orig/ ,skipping..."
+#     fi
+# done
 #####################################
-# Patch binutils
+# OLD #2 - Download required sources
 #####################################
-# wget 
+# mkdir -pv /opt/arm/src/orig
+# cd /opt/arm/src/orig
+#
+# declare -a GNU_FILES=("http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.gz"
+#                       "http://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.gz"
+#                       "http://ftp.gnu.org/gnu/mpc/mpc-1.0.2.tar.gz"
+#                       "http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.2.tar.gz");
+#
+# for GNU_URL in "${GNU_FILES[@]}"
+# do
+#     GNU_FILE=$(basename $GNU_URL)
+#     ALL_FILES+=("$GNU_FILE")
+#     if [ ! -f /opt/arm/src/orig/$GNU_FILE ]; then
+#         echo "$GNU_FILE not found, downloading..."
+#         wget -P /opt/arm/src/orig/ $GNU_URL
+#     else
+#         echo "$GNU_FILE found, skipping downloading."
+#     fi
+# done
+#####################################
+# OLD - Unpack all files
+#####################################
+# mkdir -pv /opt/arm/src/src
+# cd /opt/arm/src/src/
+#
+# for DOWNLOADED_FILE in "${ALL_FILES[@]}"
+# do
+#     if [ -f "/opt/arm/src/orig/$DOWNLOADED_FILE" ];
+#     then
+#         tar -xvf /opt/arm/src/orig/$DOWNLOADED_FILE
+#     fi
+# done
+#
+# chown -R root:root /opt/arm/src/src/
