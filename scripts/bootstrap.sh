@@ -8,7 +8,7 @@
 # Changing to a Ubuntu repository closer to home
 ###
 ORIG_REPO="http://us.archive.ubuntu.com/ubuntu/" # Ubuntu 12.04
-NEW_REPO="http://archive.ubuntu.com/ubuntu/"
+NEW_REPO="http://se.archive.ubuntu.com/ubuntu/"
 sudo sed -i.orig "s|${ORIG_REPO}|${NEW_REPO}|g" /etc/apt/sources.list
 
 ###
