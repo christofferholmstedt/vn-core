@@ -13,9 +13,14 @@ GIT_REVISION="2a9110cb500e6754c28864a6dfaed185b367516c"
 ###
 # Install basic dependencies
 ###
-sudo apt-get -y install gcc-4.5-base build-essential make gcc g++ flex bison patch \
+sudo apt-get -y install automake autoconf gcc-4.5-base \
+    build-essential make gcc g++ flex bison patch \
     texinfo libncurses5-dev libmpfr-dev libgmp3-dev libmpc-dev libzip-dev \
     python-dev libexpat1-dev libelf1 libelfg0 elfutils libppl9 libcloog-ppl0
+
+sudo apt-get -y install ia32-libs lib32gcc1 libc6-i386 lib32z1 lib32stdc++6 \
+    lib32asound2 lib32ncurses5 lib32gomp1 lib32z1-dev lib32bz2-dev \
+    g++-multilib gcc-multilib
 
 # libelf doesn't exist perhaps libelf1 or libelf-dev is correct?
 # testing with "libelf1"
@@ -135,10 +140,10 @@ fi
 ####################################
 source /home/vagrant/host/scripts/native-gcc4.9.0-build-variables.sh
 source /home/vagrant/host/scripts/libdir-variables.sh
+ARCH=native
 
 ### GMP
 PROG=b-gmp
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -154,7 +159,6 @@ fi
 
 ### MPFR
 PROG=b-mpfr
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -170,7 +174,6 @@ fi
 
 ### MPC
 PROG=b-mpc
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -188,7 +191,6 @@ fi
 
 ### ISL
 PROG=b-isl
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -205,7 +207,6 @@ fi
 
 ### CLOOG
 PROG=b-cloog
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -222,7 +223,6 @@ fi
 
 ###  Binutils
 PROG=b-binutils
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -243,7 +243,6 @@ fi
 
 ### GCC
 PROG=b-gcc
-ARCH=native
 if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
 then
     echo "$ARCH $PROG not compiled, compiling..."
@@ -262,6 +261,203 @@ then
         --with-isl=$NATIVE_GCC_DIR \
         --with-cloog=$NATIVE_GCC_DIR \
         --with-stage1-ldflags="-Wl,-rpath,/opt/gcc-4.9-native/lib"
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+####################################
+# Build GCC for ARM cross compilation
+####################################
+source /home/vagrant/host/scripts/arm-gcc4.9.0-build-variables.sh
+ARCH=arm-cross
+
+### GMP
+PROG=b-gmp
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/gmp-4.3.2/configure --prefix=$ARM_GCC_DIR --build=$NATIVE_GCC_TARGET --enable-cxx
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### MPFR
+PROG=b-mpfr
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/mpfr-3.1.2/configure --build=$NATIVE_GCC_TARGET \
+        --prefix=$ARM_GCC_DIR --with-gmp=$ARM_GCC_DIR
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### MPC
+PROG=b-mpc
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/mpc-1.0.2/configure --build=$NATIVE_GCC_TARGET \
+        --prefix=$ARM_GCC_DIR --with-gmp=$ARM_GCC_DIR --with-mpfr=$ARM_GCC_DIR
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### ISL
+PROG=b-isl
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/isl-0.11.2/configure --prefix=$ARM_GCC_DIR \
+        --with-gmp-prefix=$ARM_GCC_DIR
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### CLOOG
+PROG=b-cloog
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/cloog-0.18.1/configure --prefix=$ARM_GCC_DIR \
+        --with-gmp-prefix=$ARM_GCC_DIR --with-isl-prefix=$ARM_GCC_DIR
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+###  Binutils
+PROG=b-binutils
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/binutils-2.24/configure --prefix=$ARM_GCC_DIR \
+        --verbose --disable-nls --target=$ARM_GCC_TARGET --enable-interwork \
+        --enable-multilib --disable-werror --with-cloog=$ARM_GCC_DIR \
+        --with-isl=$ARM_GCC_DIR
+    make -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### GCC stage 2
+PROG=b-gcc-stage2
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/gcc/configure --target=$ARM_GCC_TARGET \
+        --prefix=$ARM_GCC_DIR --with-gnu-as --enable-multilib --with-gnu-ld \
+        --disable-nls --enable-languages=c --disable-threads --disable-libssp \
+        --enable-interwork --disable-shared --disable-lto \
+        --with-pkgversion="BAP ARM bare metal cross compiler gcc 4.9.0 stage2" \
+        --with-gmp=$ARM_GCC_DIR --with-mpfr=$ARM_GCC_DIR \
+        --with-mpc=$ARM_GCC_DIR --with-isl=$ARM_GCC_DIR \
+        --with-cloog=$ARM_GCC_DIR
+    make all-gcc -j$CORES
+    #TODO: Maybe make install here instead.
+    make install-gcc
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### GCC stage 3
+PROG=b-gcc-stage3
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/gcc/configure --enable-cross-gnattools \
+        --target=$ARM_GCC_TARGET --disable-nls \
+        --without-libiconv-prefix --disable-libffi --enable-checking=release \
+        --enable-interwork --enable-multilib --disable-libmudflap \
+        --disable-libssp --disable-libstdcxx-pch --with-gnu-as --with-gnu-ld \
+        --enable-languages=c,c++,ada --prefix=$ARM_GCC_DIR \
+        --with-bugurl="http://adv.bruhnspace.com/support" \
+        --with-pkgversion="BAP ARM bare metal cross compiler gcc 4.9.0 with C, C++, Ada" \
+        --with-newlib --with-headers=../../src_unpacked/newlib-2.0.0/newlib/libc/include \
+        --with-gmp=$ARM_GCC_DIR \
+        --with-mpfr=$ARM_GCC_DIR \
+        --with-mpc=$ARM_GCC_DIR \
+        --with-isl=$ARM_GCC_DIR \
+        --with-cloog=$ARM_GCC_DIR
+    make all-gcc -j$CORES
+    make install-gcc
+    cd ..
+    # Comming back here later on in two steps.
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### Newlib
+PROG=b-newlib
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/newlib-2.0.0/configure --target=$ARM_GCC_TARGET \
+        --prefix=$ARM_GCC_DIR --enable-interwork --enable-multilib \
+        --disable-nls --disable-shared --disable-threads \
+        --with-gnu-as --with-gnu-ld
+    make all -j$CORES
+    make install
+    cd ..
+else
+    echo "$ARCH $PROG already compiled, skipping."
+fi
+
+### Back to GCC stage 3
+PROG=b-gcc-stage3
+cd /opt/tmp/b-$ARCH/$PROG
+make all -j$CORES
+make install
+
+### GDB
+PROG=b-gdb
+if [ ! -d /opt/tmp/b-$ARCH/$PROG ]
+then
+    echo "$ARCH $PROG not compiled, compiling..."
+    mkdir -pv /opt/tmp/b-$ARCH/$PROG
+    cd /opt/tmp/b-$ARCH/$PROG
+    ../../src_unpacked/gdb-7.7/configure --target=$ARM_GCC_TARGET \
+        --prefix=$ARM_GCC_DIR --enable-interwork --enable-multilib \
+        --disable-nls --disable-shared --disable-threads \
+        --with-gnu-as --with-gnu-ld
     make -j$CORES
     make install
     cd ..
