@@ -1,3 +1,6 @@
 # Vagrant
 .vagrant
 /downloads
+
+# Custom provisioning script
+install-gcc.log
