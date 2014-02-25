@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # LOGFILE
-LOGFILE="/home/vagrant/host/install-gcc.log"
+LOGFILE="/home/vagrant/host/logs/install-gcc-$(date +%Y%m%d_%H%M).log"
 
 source /home/vagrant/host/scripts/native-gcc4.9.0-build-variables.sh
 source /home/vagrant/host/scripts/arm-gcc4.9.0-build-variables.sh
