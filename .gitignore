@@ -1,0 +1,12 @@
+# GNAT
+/build
+obj/
+project_pragmas
+
+# Vagrant
+.vagrant
+/downloads
+
+# Custom provisioning script
+install-gcc.log
+/logs/*.log
