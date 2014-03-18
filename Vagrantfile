@@ -19,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # How provisioning should be done.
     config.vm.provision :shell, :path => "./scripts/bootstrap.sh"
     config.vm.provision :shell, :path => "./scripts/install-gnat.sh"
-    config.vm.provision :shell, :path => "./scripts/install-gcc4.9.0.sh"
+    config.vm.provision :shell, :path => "./scripts/install-valgrind.sh"
 
     # Open up the VM to the local network.
     # Disabled this by default as it will require the user to manually
