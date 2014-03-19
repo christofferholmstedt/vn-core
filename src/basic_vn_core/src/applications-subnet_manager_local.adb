@@ -40,7 +40,9 @@ package body Applications.Subnet_Manager_Local is
     begin
         Ada.Text_IO.Put_Line("Task type cyclic - Start, ID: "
                                 & Integer'Image(Task_ID));
-        Next_Period := Ada.Real_Time.Clock + Period;
+
+        Global_Start_Time.Get(Next_Period);
+        -- Next_Period := Ada.Real_Time.Clock + Period;
         loop
             delay until Next_Period;
 
@@ -75,7 +77,7 @@ package body Applications.Subnet_Manager_Local is
                                 & Integer'Image(Task_ID));
     end Cyclic;
 
-    C1: Cyclic(20, 200, 1, 3);
-    C2: Cyclic(15, 300, 2, 5);
+    C1: Cyclic(20, 2000, 1, 3);
+    C2: Cyclic(15, 3000, 2, 5);
 
 end Applications.Subnet_Manager_Local;
