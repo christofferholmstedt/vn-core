@@ -1,4 +1,4 @@
-package body Applications is
+package body Application_Settings is
 
    -- Common start time for all applications.
    protected body Global_Start_time is
@@ -14,4 +14,4 @@ package body Applications is
 
    end Global_Start_Time;
 
-end Applications;
+end Application_Settings;

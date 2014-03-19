@@ -1,7 +1,7 @@
 with Ada.Real_Time;
 with System;
 
-package Applications is
+package Application_Settings is
 
    -- Common start time for all applications.
    protected Global_Start_time is
@@ -12,4 +12,4 @@ package Applications is
       First_Time: Boolean := True;
    end Global_Start_Time;
 
-end Applications;
+end Application_Settings;

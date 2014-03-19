@@ -1,6 +1,6 @@
 with System;
 
-package Applications.Subnet_Manager_Local is
+package Subnet_Manager_Local is
 
     -- Example partly from "Concurrent and Real-Time Programming
     -- in Ada by Alan Burns and Andy Wellings
@@ -25,4 +25,4 @@ package Applications.Subnet_Manager_Local is
 
     My_Data : Shared_Integer(42);
 
-end Applications.Subnet_Manager_Local;
+end Subnet_Manager_Local;

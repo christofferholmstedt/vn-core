@@ -1,7 +1,8 @@
 with Ada.Real_Time;
 with Ada.Text_IO;
+with Application_Settings;
 
-package body Applications.Subnet_Manager_Local is
+package body Subnet_Manager_Local is
 
     -- Example from "Concurrent and Real-Time Programming
     -- in Ada by Alan Burns and Andy Wellings
@@ -41,7 +42,7 @@ package body Applications.Subnet_Manager_Local is
         Ada.Text_IO.Put_Line("Task type cyclic - Start, ID: "
                                 & Integer'Image(Task_ID));
 
-        Global_Start_Time.Get(Next_Period);
+        Application_Settings.Global_Start_Time.Get(Next_Period);
         -- Next_Period := Ada.Real_Time.Clock + Period;
         loop
             delay until Next_Period;
@@ -80,4 +81,4 @@ package body Applications.Subnet_Manager_Local is
     C1: Cyclic(20, 2000, 1, 3);
     C2: Cyclic(15, 3000, 2, 5);
 
-end Applications.Subnet_Manager_Local;
+end Subnet_Manager_Local;

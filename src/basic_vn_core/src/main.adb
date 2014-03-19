@@ -1,4 +1,4 @@
-with Applications.Subnet_Manager_Local;
+with Subnet_Manager_Local;
 
 procedure Main is
 begin
