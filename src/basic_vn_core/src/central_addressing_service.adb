@@ -2,7 +2,7 @@ with Ada.Real_Time;
 with Ada.Text_IO;
 with Application_Settings;
 
-package body Subnet_Manager_Local is
+package body Central_Addressing_Service is
 
     -- Example from "Concurrent and Real-Time Programming
     -- in Ada by Alan Burns and Andy Wellings
@@ -78,7 +78,7 @@ package body Subnet_Manager_Local is
                                 & Integer'Image(Task_ID));
     end Cyclic;
 
-    C1: Cyclic(20, 2000, 1, 3);
-    C2: Cyclic(15, 3000, 2, 5);
+    C1: Cyclic(20, 1000, 101, 3);
+    C2: Cyclic(15, 2000, 102, 5);
 
-end Subnet_Manager_Local;
+end Central_Addressing_Service;
