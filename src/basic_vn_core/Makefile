@@ -16,6 +16,7 @@ all: clean
 	gnatmake -d -p -P basic_vn_core.gpr
 
 clean:
-	rm -rf obj/*.o
-	rm -rf obj/*.ali
-	rm -rf obj/main
+	gnat clean -P basic_vn_core.gpr
+
+clean-all:
+	gnat clean -r -P basic_vn_core.gpr
