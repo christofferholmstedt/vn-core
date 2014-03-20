@@ -31,6 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Virtual Machine. Disable default mapping.
     config.vm.synced_folder ".", "/vagrant", :disabled => true
     config.vm.synced_folder "./", "/home/vagrant/host"
+    config.vm.synced_folder "../vn-lib/", "/home/vagrant/vn-lib"
 
     # Using VirtualBox:
     config.vm.provider :virtualbox do |vb|

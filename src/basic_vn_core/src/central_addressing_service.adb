@@ -1,84 +1,45 @@
 with Ada.Real_Time;
 with Ada.Text_IO;
 with Application_Settings;
+with VN_Message;
 
 package body Central_Addressing_Service is
 
-    -- Example from "Concurrent and Real-Time Programming
-    -- in Ada by Alan Burns and Andy Wellings
-    -- pp. 131 - 132, ISBN: 978-0-521-86697-2
-    protected body Shared_Integer is
-        function Read return Integer is
-        begin
-            return The_Data;
-        end Read;
+   task body CAS is
+      use Ada.Real_Time;
+      i: Integer := 1;
+      Message: VN_Message.VN_Message_Basic;
+      Status: VN_Message.Send_Status;
+      Version: VN_Message.VN_Version;
 
-        procedure Write(New_Value : Integer) is
-        begin
-            The_Data := New_Value;
-        end Write;
+      Next_Period : Ada.Real_Time.Time;
+      Period : constant Ada.Real_Time.Time_Span :=
+                           Ada.Real_Time.Microseconds(Cycle_Time);
+   begin
+      Ada.Text_IO.Put_Line("Task type CAS - Start, ID: "
+                              & Integer'Image(Task_ID));
 
-        procedure Increment(By : Integer) is
-        begin
-            The_Data := The_Data + By;
-        end Increment;
-    end Shared_Integer;
+      Application_Settings.Global_Start_Time.Get(Next_Period);
+      loop
+         delay until Next_Period;
+         ----------------------------
 
-    -- Example partly from "Concurrent and Real-Time Programming
-    -- in Ada by Alan Burns and Andy Wellings
-    -- pp. 440 - 441, ISBN: 978-0-521-86697-2
-    task body Cyclic is
-        use Ada.Real_Time;
-        i: Integer := 1;
-        Old_Value : Integer;
+         Application_Settings.IPC_From_CAS.Send(Message, Status);
+         Ada.Text_IO.Put("CAS Sent: ");
+         Version := Message.Get_Version;
+         VN_Version_IO.Put(Version);
+         Ada.Text_IO.Put_Line("");
+         Message.Set_Version(VN_Message.VN_Version(i + 1));
 
-        Seconds_Since_Epoch : Ada.Real_Time.Seconds_Count;
-        Fractional_Time: Ada.Real_Time.Time_Span;
+         ----------------------------
+         Next_Period := Next_Period + Period;
+         i := i + 1;
+         exit when i = 6;
+      end loop;
+      Ada.Text_IO.Put_Line("Task type CAS - End, ID:"
+                              & Integer'Image(Task_ID));
+   end CAS;
 
-        Next_Period : Ada.Real_Time.Time;
-        Period : constant Ada.Real_Time.Time_Span :=
-                            Ada.Real_Time.Microseconds(Cycle_Time);
-    begin
-        Ada.Text_IO.Put_Line("Task type cyclic - Start, ID: "
-                                & Integer'Image(Task_ID));
-
-        Application_Settings.Global_Start_Time.Get(Next_Period);
-        -- Next_Period := Ada.Real_Time.Clock + Period;
-        loop
-            delay until Next_Period;
-
-            Old_Value := My_Data.Read;
-            My_Data.Increment(Increment_By);
-
-            Ada.Real_Time.Split(Next_Period, Seconds_Since_Epoch,
-                                    Fractional_Time);
-
-            Ada.Text_IO.Put_Line("Task"
-                                & Integer'Image(Task_ID)
-                                & ":"
-                                & Integer'Image(Old_Value)
-                                & " +"
-                                & Integer'Image(Increment_By)
-                                & " ="
-                                & Integer'Image(My_Data.Read)
-                                & " - ("
-                                    & Ada.Real_Time.Seconds_Count'Image(
-                                        Seconds_Since_Epoch) &
-                                    " +" &
-                                    Duration'Image(
-                                        Ada.Real_Time.To_Duration(
-                                            Fractional_Time)) & ")");
-
-
-            Next_Period := Next_Period + Period;
-            i := i + 1;
-            exit when i = 6;
-        end loop;
-        Ada.Text_IO.Put_Line("Task type cyclic - End, ID:"
-                                & Integer'Image(Task_ID));
-    end Cyclic;
-
-    C1: Cyclic(20, 1000, 101, 3);
-    C2: Cyclic(15, 2000, 102, 5);
+   CAS1: CAS(20, 1000, 101, 3);
 
 end Central_Addressing_Service;

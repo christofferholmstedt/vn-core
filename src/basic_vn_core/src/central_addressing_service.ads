@@ -1,28 +1,16 @@
 with System;
+with Ada.Text_IO;
+with VN_Message;
 
 package Central_Addressing_Service is
 
-    -- Example partly from "Concurrent and Real-Time Programming
-    -- in Ada by Alan Burns and Andy Wellings
-    -- pp. 440 - 441, ISBN: 978-0-521-86697-2
-    task type Cyclic(Pri : System.Priority;
+   package VN_Version_IO is new Ada.Text_IO.Modular_IO (VN_Message.VN_Version);
+
+    task type CAS(Pri : System.Priority;
                         Cycle_Time : Positive;
                         Task_ID : Positive;
                         Increment_By : Positive) is
         pragma Priority(Pri);
-    end Cyclic;
-
-    -- Example from "Concurrent and Real-Time Programming
-    -- in Ada by Alan Burns and Andy Wellings
-    -- pp. 131 - 132, ISBN: 978-0-521-86697-2
-    protected type Shared_Integer(Initial_Value : Integer) is
-        function Read return Integer;
-        procedure Write(New_Value : Integer);
-        procedure Increment(By : Integer);
-    private
-        The_Data : Integer := Initial_Value;
-    end Shared_Integer;
-
-    My_Data : Shared_Integer(100);
+    end CAS;
 
 end Central_Addressing_Service;
