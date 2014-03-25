@@ -21,9 +21,9 @@ package Application_Settings is
    SM_L_IPC_Wrapper: Communication.IPC.IPC_Wrapper(PO_CAS_SM_L'Access, true);  -- Step 3
 
    -- CAS Communication
-   CAS_Communication: Communication.Com'Class := CAS_IPC_Wrapper;
+   CAS_Communication: Communication.IPC.IPC_Wrapper := CAS_IPC_Wrapper;
 
    -- SM-L Communication
-   SM_L_Communication: Communication.Com'Class := SM_L_IPC_Wrapper;
+   SM_L_Communication: Communication.IPC.IPC_Wrapper := SM_L_IPC_Wrapper;
 
 end Application_Settings;
