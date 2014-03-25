@@ -7,6 +7,7 @@ package body Central_Addressing_Service is
 
    task body CAS is
       use Ada.Real_Time;
+      use Application_Settings;
       i: Integer := 1;
       Message: VN_Message.VN_Message_Basic;
       Status: VN_Message.Send_Status;
@@ -19,12 +20,12 @@ package body Central_Addressing_Service is
       Ada.Text_IO.Put_Line("Task type CAS - Start, ID: "
                               & Integer'Image(Task_ID));
 
-      Application_Settings.Global_Start_Time.Get(Next_Period);
+      Global_Start_Time.Get(Next_Period);
       loop
          delay until Next_Period;
          ----------------------------
 
-         Application_Settings.IPC_From_CAS.Send(Message, Status);
+         CAS_Communication.Send(Message, Status);
          Ada.Text_IO.Put("CAS Sent: ");
          Version := Message.Get_Version;
          VN_Version_IO.Put(Version);
