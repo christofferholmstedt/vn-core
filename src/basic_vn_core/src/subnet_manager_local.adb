@@ -8,9 +8,9 @@ package body Subnet_Manager_Local is
       use Ada.Real_Time;
       use Application_Settings;
       i: Integer := 1;
-      Message: VN_Message.VN_Message_Basic;
-      Status: VN_Message.Receive_Status;
-      Version: VN_Message.VN_Version;
+      Message: VN.Message.VN_Message_Basic;
+      Status: VN.Message.Receive_Status;
+      Version: VN.Message.VN_Version;
 
       Next_Period : Ada.Real_Time.Time;
       Period : constant Ada.Real_Time.Time_Span :=

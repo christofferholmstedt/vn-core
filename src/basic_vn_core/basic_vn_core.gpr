@@ -1,4 +1,4 @@
-with "../../../vn-lib/src/communication/communication.gpr";
+with "../../../vn-lib/src/vn/communication/communication.gpr";
 
 project Basic_VN_Core is
     for Source_Dirs use ("src");
