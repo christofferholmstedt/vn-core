@@ -1,16 +1,17 @@
 with Ada.Real_Time;
 with Ada.Text_IO;
 with Application_Settings;
-with VN_Message;
+with VN.Message;
 
 package body Central_Addressing_Service is
 
    task body CAS is
       use Ada.Real_Time;
+      use Application_Settings;
       i: Integer := 1;
-      Message: VN_Message.VN_Message_Basic;
-      Status: VN_Message.Send_Status;
-      Version: VN_Message.VN_Version;
+      Message: VN.Message.VN_Message_Basic;
+      Status: VN.Message.Send_Status;
+      Version: VN.Message.VN_Version;
 
       Next_Period : Ada.Real_Time.Time;
       Period : constant Ada.Real_Time.Time_Span :=
@@ -19,17 +20,17 @@ package body Central_Addressing_Service is
       Ada.Text_IO.Put_Line("Task type CAS - Start, ID: "
                               & Integer'Image(Task_ID));
 
-      Application_Settings.Global_Start_Time.Get(Next_Period);
+      Global_Start_Time.Get(Next_Period);
       loop
          delay until Next_Period;
          ----------------------------
 
-         Application_Settings.IPC_From_CAS.Send(Message, Status);
+         CAS_Communication.Send(Message, Status);
          Ada.Text_IO.Put("CAS Sent: ");
          Version := Message.Get_Version;
          VN_Version_IO.Put(Version);
          Ada.Text_IO.Put_Line("");
-         Message.Set_Version(VN_Message.VN_Version(i + 1));
+         Message.Set_Version(VN.Message.VN_Version(i + 1));
 
          ----------------------------
          Next_Period := Next_Period + Period;

@@ -6,10 +6,11 @@ package body Subnet_Manager_Local is
 
    task body SM_L is
       use Ada.Real_Time;
+      use Application_Settings;
       i: Integer := 1;
-      Message: VN_Message.VN_Message_Basic;
-      Status: VN_Message.Receive_Status;
-      Version: VN_Message.VN_Version;
+      Message: VN.Message.VN_Message_Basic;
+      Status: VN.Message.Receive_Status;
+      Version: VN.Message.VN_Version;
 
       Next_Period : Ada.Real_Time.Time;
       Period : constant Ada.Real_Time.Time_Span :=
@@ -18,12 +19,12 @@ package body Subnet_Manager_Local is
       Ada.Text_IO.Put_Line("Task type SM_L - Start, ID: "
                               & Integer'Image(Task_ID));
 
-      Application_Settings.Global_Start_Time.Get(Next_Period);
+      Global_Start_Time.Get(Next_Period);
       loop
          delay until Next_Period;
          ----------------------------
 
-         Application_Settings.IPC_From_CAS.Receive(Message, Status);
+         SM_L_Communication.Receive(Message, Status);
          Version := Message.Get_Version;
          Ada.Text_IO.Put("SM_L Received: ");
          VN_Version_IO.Put(Version);
